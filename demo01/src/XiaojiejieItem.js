@@ -15,6 +15,14 @@ class XiaojiejieItem extends Component {
   componentWillReceiveProps(){
     console.log('child---componentWillReceiveProps')
   }
+  
+  // 需要返回一个布尔值,true时才会继续执行,false不更新
+  // nextProps:变化后的属性;
+  // nextState:变化后的状态;
+  // 属于性能优化
+  shouldComponentUpdate(nextProps,nextState) {
+    return nextProps.content !== this.props.content
+  }
   render() { 
     return (
       <li 

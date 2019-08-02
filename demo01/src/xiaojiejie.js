@@ -1,5 +1,9 @@
 import React,{Component,Fragment} from 'react'
 import XiaojiejieItem from './XiaojiejieItem'
+import './style.css' 
+import axios from 'axios'
+import Boss from './Boss'
+import {CSSTransition, TransitionGroup} from 'react-transition-group'
 
 class Xiaojiejie extends Component {
   
@@ -7,8 +11,9 @@ class Xiaojiejie extends Component {
   constructor(props){
     super(props)  // 调用父类的构造函数,固定写法
     this.state = {
+      show:true,
       inputValue:'', // input中的值
-      list:['基础按摩','精油开背','躺式采耳','中药足疗'] // 服务列表
+      list:[] // 服务列表
     }
   }
   componentWillMount() {
@@ -16,7 +21,9 @@ class Xiaojiejie extends Component {
   }
 
   // 需要返回一个布尔值,true时才会继续执行,false不更新
-  shouldComponentUpdate() {
+  // nextProps:变化后的属性;
+  // nextState:变化后的状态;
+  shouldComponentUpdate(nextProps,nextState) {
     console.log('1-shouldComponentUpdate')
     return true
   }
@@ -43,27 +50,47 @@ class Xiaojiejie extends Component {
             <button onClick={this.addListener.bind(this)}>增加服务</button>
         </div>
         <ul ref={(ul) => this.ul = ul}>
+        <TransitionGroup>
           {
             this.state.list.map((item,index) => {
               return (
                   // 父组件方法通过属性方式传给子组件用 2019.8.1
-                  <XiaojiejieItem 
-                    avname='波多野结衣'
-                    content={item} 
-                    key={index + item}
-                    index={index}
-                    deleteItem={this.deleteItem.bind(this)}
-                  />
+                  <CSSTransition
+                    timeout={1000}
+                    classNames='boss-text'
+                    appear={true}
+                    key={index+item} 
+                  >
+                    <XiaojiejieItem 
+                      avname='波多野结衣'
+                      content={item} 
+                      key={index + item}
+                      index={index}
+                      deleteItem={this.deleteItem.bind(this)}
+                    />
+                  </CSSTransition>
               )
             })
           }
+        </TransitionGroup>
         </ul>
+        <Boss />
       </Fragment>
     )
   }
 
+  // 一般推荐在这个页面请求初始化数据
   componentDidMount() {
     console.log('componentDidMount-----组件完成挂载页面')
+    axios.get('http://rap2api.taobao.org/app/mock/227263/serviceList')
+        .then(res => {
+          this.setState({
+            list:res.data.list
+          })
+        })
+        .catch(err => {
+          console.log(console.log(err))
+        })
   }
 
   componentDidUpdate() {
@@ -86,7 +113,7 @@ class Xiaojiejie extends Component {
   // 添加服务事件
   addListener() {
     this.setState({
-      list:[this.state.inputValue,...this.state.list], // 扩展运算符
+      list:[...this.state.list,this.state.inputValue], // 扩展运算符
       inputValue:''
     }, () => {
       console.log(this.ul.querySelectorAll('li').length)
