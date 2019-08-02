@@ -25,6 +25,11 @@ class XiaojiejieItem extends Component {
       </li>
      )
   }
+
+  componentWillUnmount() {
+    console.log('child---componentWillUnmount')
+  }
+
   // 点击删除
   handleClick(){
     this.props.deleteItem(this.props.index)
