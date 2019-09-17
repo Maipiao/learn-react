@@ -39,6 +39,7 @@ class XiaojiejieItem extends Component {
   }
 
   // 点击删除
+  // 子组件通过父组件传过来的方法调用来删除
   handleClick(){
     this.props.deleteItem(this.props.index)
   }
