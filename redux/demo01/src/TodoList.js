@@ -1,26 +1,34 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css'
 import {Input, Button, List} from 'antd'
+import store from './store' // 引入store
 
-const data = [
-  '早8点开晨会，分配今天的开发工作',
-  '早9点和项目经理作开发需求讨论会',
-  '晚5:30对今日代码进行review'
-]
 class TodoList extends Component {
   constructor(props) {
     super(props);
-    this.state = {  }
+    this.state = store.getState()
+    this.changeInputValue = this.changeInputValue.bind(this)
+    this.clickBtn = this.clickBtn.bind(this)
+    this.storeChange = this.storeChange.bind(this)  //转变this指向
+    store.subscribe(this.storeChange) //订阅Redux的状态
   }
   render() { 
     return ( 
       <div style={{margin:'10px'}}>
         <div>
-          <Input placeholder="请输入" style={{width:'250px',marginRight:'10px'}}></Input>
-          <Button type="primary">增加</Button>
+          <Input 
+            placeholder='write something'
+            style={{width:'250px',marginRight:'10px'}}
+            value={this.state.inputValue}
+            onChange={this.changeInputValue}>
+          </Input>
+          <Button 
+            type="primary"
+            onClick={this.clickBtn}
+          >增加</Button>
         </div>
         <div style={{width:'325px',marginTop:'10px'}}>
-          <List dataSource={data}
+          <List dataSource={this.state.list}
                 bordered
                 renderItem={item=>(<List.Item>{item}</List.Item>)}
           >
@@ -28,6 +36,24 @@ class TodoList extends Component {
         </div>
       </div>
     );
+  }
+  // 输入框事件
+  changeInputValue(e){
+    const action = {
+        type:'changeInput',
+        value:e.target.value
+    }
+    store.dispatch(action)
+  }
+  // 改变状态
+  storeChange(){
+    this.setState(store.getState())
+  }
+  // 新增事件
+  clickBtn(e){
+    if (!this.state.inputValue) return
+    const action = { type:'addItem'}
+    store.dispatch(action)
   }
 }
  
